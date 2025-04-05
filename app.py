@@ -1,33 +1,35 @@
-import re
+import re 
 import streamlit as st
 import string, random
 
 def check_password_strength(password):
     score = 0
+
+    st.markdown("### 🧪 Password Strength Feedback")
     
     # Length Check
     if len(password) >= 8:
         score += 1
     else:
-        st.text("❌ Password should be at least 8 characters long.")
+        st.warning("❌ Password should be at least 8 characters long.")
     
     # Upper & Lowercase Check
     if re.search(r"[A-Z]", password) and re.search(r"[a-z]", password):
         score += 1
     else:
-        st.text("❌ Include both uppercase and lowercase letters.")
+        st.warning("❌ Include both uppercase and lowercase letters.")
     
     # Digit Check
     if re.search(r"\d", password):
         score += 1
     else:
-        st.text("❌ Add at least one number (0-9).")
+        st.warning("❌ Add at least one number (0-9).")
     
     # Special Character Check
     if re.search(r"[!@#$%^&*]", password):
         score += 1
     else:
-        st.text("❌ Include at least one special character (!@#$%^&*).")
+        st.warning("❌ Include at least one special character (!@#$%^&*).")
     
     # Strength Rating
     if score == 4:
@@ -39,34 +41,31 @@ def check_password_strength(password):
 
     return score
 
-def password_generator(numbers, uppercase, symbols, password_length):
-    characters = string.ascii_lowercase
-    if uppercase:
-        characters += string.ascii_uppercase
-    if numbers:
-        characters += string.digits
-    if symbols:
-        characters += "!@#$%^&*"
-    generatedpassword = ''.join(random.choice(characters) for _ in range(password_length))
-    return generatedpassword
+def password_generator(password_length):
+    characters = string.ascii_letters + string.digits + "!@#$%^&*"
+    return ''.join(random.choice(characters) for _ in range(password_length))
 
-# Get user input
+# Title
+st.title("🔒 Password Strength Checker & Generator")
 
-st.title("🔒 Password Checker & Generator")
-password = st.text_input("Enter your password: ")
-if st.button("Check Password"): 
-    score = check_password_strength(password)
+# Check Password
+st.header("🔍 Check Your Password Strength")
+password = st.text_input("Enter your password:", type="password")
+if st.button("Check Password"):
+    if password:
+        check_password_strength(password)
+    else:
+        st.warning("⚠️ Please enter a password before checking.")
+
+# Divider
+st.markdown("---")
 
 # Password Generator
-st.subheader("Generate a Secure Password")
-col1, col2 = st.columns(2)
-with col1:
-    password_length = st.slider(label="Password length", min_value=8, max_value=32, step=1, value=12)
-    uppercase = st.checkbox("Include Uppercase Letters", value=True)
-    numbers = st.checkbox("Include Numbers", value=True)
-    symbols = st.checkbox("Include Symbols",  value=True)
-    button = st.button("Generate Password")
-with col2:
-    if button:
-        generated_password = password_generator(uppercase, numbers, symbols, password_length)
-        st.success(f"🔑 Your Generated Password: `{generated_password}`")
+st.header("⚙️ Generate a Secure Password")
+password_length = st.slider("Choose password length:", min_value=8, max_value=32, value=12)
+
+if st.button("Generate Password"):
+    generated_password = password_generator(password_length)
+    st.success("🔑 Your secure password is ready:")
+    st.code(generated_password, language="")
+
